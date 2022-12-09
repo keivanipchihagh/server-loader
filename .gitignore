@@ -3,3 +3,5 @@
 
 # data directories
 nginx-proxy-manager/data
+postgres/postgres-data
+postgres/pgadmin-data

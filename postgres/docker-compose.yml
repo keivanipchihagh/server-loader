@@ -1,0 +1,60 @@
+version: '3.7'
+
+services:
+
+  # Postgres Server
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "${POSTGRES_DB:-postgres}", "-U", "${POSTGRES_USER:-postgres}"]
+      timeout: 10s
+      interval: 10s
+      retries: 10
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - services
+
+
+  # pgadmin4
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:6.14
+    restart: unless-stopped
+    user: "$UID:$GID"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: '${PGADMIN_CONFIG_SERVER_MODE:-False}'  # For servers-side deployment
+    volumes:
+       - ./pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - services
+
+  # Postgres Exporter
+  postgres-exporter:
+    image: wrouesnel/postgres_exporter:v0.8.0
+    container_name: postgres-exporter
+    restart: always
+    ports:
+      - ${POSTGRES_EXPORTER_PORT:-9187}:9187
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-postgres}?sslmode=${POSTGRES_SSL:-disable}"
+    networks:
+      - services
+
+
+networks:
+  services:
+    name: services
+    external: true

@@ -26,4 +26,5 @@ services:
 
 networks:
   services:
+    name: services
     external: true
