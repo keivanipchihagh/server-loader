@@ -1,0 +1,5 @@
+# dotenv
+.env
+
+# data directories
+nginx-proxy-manager/data
