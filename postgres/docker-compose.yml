@@ -22,7 +22,7 @@ services:
       - ./postgres-data:/var/lib/postgresql/data
     networks:
       - services
-
+      - monitoring
 
   # pgadmin4
   pgadmin:
@@ -37,7 +37,7 @@ services:
     volumes:
        - ./pgadmin-data:/var/lib/pgadmin
     ports:
-      - "5050:80"
+      - "${PGADMIN_PORT:-5050}:80"
     networks:
       - services
 
@@ -51,10 +51,13 @@ services:
     environment:
       DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-postgres}?sslmode=${POSTGRES_SSL:-disable}"
     networks:
-      - services
+      - monitoring
 
 
 networks:
   services:
     name: services
     external: true
+  monitoring:
+    name: monitoring
+    internal: true

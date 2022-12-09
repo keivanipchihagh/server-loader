@@ -2,6 +2,13 @@
 .env
 
 # data directories
-nginx-proxy-manager/data
-postgres/postgres-data
-postgres/pgadmin-data
+grafana-data/
+prometheus-data/
+portainer-data/
+postgres-data/
+redis-data/
+redis.conf/
+pgadmin-data/
+data/
+letsencrypt/
+airflow-data/
