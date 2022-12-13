@@ -4,6 +4,11 @@ x-common:
   &common
   image: apache/airflow:2.3.0
   user: "${AIRFLOW_UID:-0}:0"
+  environment:
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/airflow"
+    AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: "False"
+    _AIRFLOW_DB_UPGRADE: "True"
+    AIRFLOW__CORE__LOGGING_LEVEL: "INFO"
   env_file: 
     - ../.env
   volumes:
@@ -28,6 +33,11 @@ services:
     <<: *common
     <<: *depends-on
     container_name: airflow-scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
     command: scheduler
     restart: on-failure
 
@@ -46,9 +56,9 @@ services:
       - "${AIRFLOW_WEBSERVER_PORT:-8085}:8080"
 
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://0.0.0.0:${AIRFLOW_WEBSERVER_PORT}/health"]
-      interval: 30s
-      timeout: 30s
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
       retries: 3
   
   # Airflow Initializer
