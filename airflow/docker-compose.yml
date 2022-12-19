@@ -2,13 +2,18 @@ version: '3.7'
 
 x-common:
   &common
-  image: apache/airflow:2.3.0
+  build:
+      context: .
+      dockerfile: Dockerfile
+
   user: "${AIRFLOW_UID:-0}:0"
   environment:
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/airflow"
     AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: "False"
     _AIRFLOW_DB_UPGRADE: "True"
     AIRFLOW__CORE__LOGGING_LEVEL: "INFO"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
   env_file: 
     - ../.env
   volumes:
