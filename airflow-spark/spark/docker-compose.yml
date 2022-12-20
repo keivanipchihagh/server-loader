@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   spark:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: spark-master
@@ -19,7 +19,7 @@ services:
       - spark
 
   spark-worker:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: spark-worker
