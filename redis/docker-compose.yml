@@ -7,29 +7,23 @@ services:
     image: redis:7.0-alpine
     container_name: redis
     restart: always
-
     command:
       - '--save 20 1'
       - '--loglevel warning'
       - '--requirepass ${REDIS_PASSWORD}'
       - '--maxmemory 64M'
       - '--maxmemory-policy allkeys-lru'
-
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 10s
       timeout: 10s
       retries: 3
-
     ports:
       - ${REDIS_PORT:-6379}:6379
-
     volumes:
       - ./redis-data:/var/lib/redis # data persistence
       - ./redis.conf:/usr/local/etc/redis/redis.conf # data persistence
-
     networks:
-      - services
       - monitoring
 
 
@@ -43,13 +37,11 @@ services:
     environment:
       REDIS_EXPORTER_INCL_SYSTEM_METRICS: "true"
     command: --redis.password=${REDIS_PASSWORD}   # Global password for all redis instances for now; Use multiple ex>    networks:
+    networks:
       - monitoring
 
 
 networks:
-  services:
-    name: services
-    external: true
   monitoring:
     name: monitoring
     internal: true
