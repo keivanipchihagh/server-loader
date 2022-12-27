@@ -34,7 +34,6 @@ services:
       - SPARK_SSL_ENABLED=no
     networks:
       - spark
-      - services
 
 networks:
   services:
