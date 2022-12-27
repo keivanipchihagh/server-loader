@@ -12,3 +12,4 @@ pgadmin-data/
 data/
 letsencrypt/
 airflow-data/
+auth/
