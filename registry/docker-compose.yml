@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.7'
 
 services:
   registry:
@@ -16,7 +16,7 @@ services:
       - ./data:/data
       # - ./auth:/auth
     networks:
-      - services
+      - registry
 
   registry-ui:
     container_name: registry-ui
@@ -34,9 +34,13 @@ services:
     depends_on:
       - registry
     networks:
-      - services
+      - nginx
+      - registry
 
 networks:
-  services:
-    name: services
+  nginx:
+    name: nginx
     external: true
+  registry:
+    name: registry
+    internal: true

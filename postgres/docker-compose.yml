@@ -21,8 +21,7 @@ services:
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     networks:
-      - services
-      - monitoring
+      - postgres
 
   # pgadmin4
   pgadmin:
@@ -39,7 +38,8 @@ services:
     ports:
       - "${PGADMIN_PORT:-5050}:80"
     networks:
-      - services
+      - postgres
+      - nginx
 
   # Postgres Exporter
   postgres-exporter:
@@ -51,13 +51,17 @@ services:
     environment:
       DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-postgres}?sslmode=${POSTGRES_SSL:-disable}"
     networks:
+      - postgres
       - monitoring
 
 
 networks:
-  services:
-    name: services
+  nginx:
+    name: nginx
     external: true
   monitoring:
     name: monitoring
+    internal: true
+  postgres:
+    name: postgres
     internal: true

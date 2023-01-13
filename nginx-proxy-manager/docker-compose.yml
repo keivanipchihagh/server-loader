@@ -21,10 +21,10 @@ services:
       interval: 10s
 
     networks:
-      - services
+      - nginx
 
 
 networks:
-  services:
-    name: services
+  nginx:
+    name: nginx
     external: true
