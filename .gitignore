@@ -13,3 +13,5 @@ data/
 letsencrypt/
 airflow-data/
 auth/
+certs/
+db/
