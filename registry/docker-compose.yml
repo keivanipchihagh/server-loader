@@ -17,6 +17,7 @@ services:
       # - ./auth:/auth
     networks:
       - registry
+      - nginx
 
   registry-ui:
     container_name: registry-ui
