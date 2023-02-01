@@ -1,6 +1,3 @@
-# dotenv
-.env
-
 # data directories
 grafana-data/
 prometheus-data/
@@ -15,3 +12,8 @@ airflow-data/
 auth/
 certs/
 db/
+
+# secrets and sensetive files
+.env
+*-secrets.*
+*-secret.*
