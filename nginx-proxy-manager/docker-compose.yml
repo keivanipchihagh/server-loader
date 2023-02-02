@@ -12,8 +12,8 @@ services:
       - "${NPM_HTTPS_PORT:-443}:443" # HTTPS port
 
     volumes:
-      - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
+      - ./volume/data:/data
+      - ./volume/letsencrypt:/etc/letsencrypt
 
     healthcheck:
       test: ["CMD", "/bin/check-health"]
