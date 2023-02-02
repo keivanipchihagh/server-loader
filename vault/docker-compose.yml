@@ -6,7 +6,6 @@ services:
   openssl:
     container_name: openssl
     image: frapsoft/openssl
-    restart: always
     command: req -nodes -x509 -newkey rsa:2048 -sha256 -keyout /data/privkey.pem -out /data/fullchain.pem -days 365 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=${DOMAIN}"
     volumes:
       - ./volume/certs/${DOMAIN}:/data/

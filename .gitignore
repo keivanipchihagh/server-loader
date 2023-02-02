@@ -1,19 +1,26 @@
-# data directories
-grafana-data/
-prometheus-data/
-portainer-data/
-postgres-data/
-redis-data/
-redis.conf/
-pgadmin-data/
+# data files and dirs
+*-data/
+data-*/
 data/
-letsencrypt/
-airflow-data/
-auth/
-certs/
-db/
+
+# log files and dirs
+*-logs/
+logs-*
+logs/
 
 # secrets and sensetive files
 .env
 *-secrets.*
 *-secret.*
+
+# volume dir
+volume/
+
+# other
+redis.conf/
+letsencrypt/
+auth/
+certs/
+db/
+file/
+policies/
