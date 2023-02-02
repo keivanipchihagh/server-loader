@@ -22,9 +22,13 @@ services:
 
     networks:
       - nginx
+      - public
 
 
 networks:
   nginx:
     name: nginx
+    internal: true
+  public:
+    name: public
     external: true

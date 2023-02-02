@@ -3,12 +3,22 @@ version: '3.7'
 services:
 
   # SSL Certificate
-  openssl:
-    container_name: openssl
-    image: frapsoft/openssl
-    command: req -nodes -x509 -newkey rsa:2048 -sha256 -keyout /data/privkey.pem -out /data/fullchain.pem -days 365 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=${DOMAIN}"
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    restart: on-failure
+    environment:
+      DOMAIN: '${DOMAIN}'
+      EMAIL: '${EMAIL}'
+    command: certonly --standalone --quiet -d ${DOMAIN} --agree-tos --email ${EMAIL}
+    ports:
+      - 443:443
+      - 80:80
     volumes:
-      - ./volume/certs/${DOMAIN}:/data/
+      - ./volume/certs/:/etc/letsencrypt/live/
+      - ./volume/letsencrypt/etc/:/etc/letsencrypt
+      - ./volume/letsencrypt/var/lib/:/var/lib/letsencrypt
+      - ./volume/letsencrypt/var/log/:/var/log/letsencrypt
 
   # Vault
   vault:
@@ -26,10 +36,19 @@ services:
     cap_add:
       - IPC_LOCK
     depends_on:
-      - openssl
+      - certbot
     volumes:
       - ./volume/logs:/vault/logs
       - ./volume/file:/vault/file
       - ./volume/config:/vault/config
       - ./volume/policies:/vault/policies
-      - ./volume/certs/${DOMAIN}:/certs
+      - /etc/letsencrypt/live/${DOMAIN}/fullchain.pem/:/certs/fullchain.pem/
+      - /etc/letsencrypt/live/${DOMAIN}/privkey.pem:/certs/privkey.pem
+    networks:
+      - nginx
+
+
+networks:
+  nginx:
+    name: nginx
+    internal: true

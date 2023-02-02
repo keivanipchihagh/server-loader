@@ -3,12 +3,22 @@ version: '3.7'
 services:
 
   # SSL Certificate
-  openssl:
-    container_name: openssl
-    image: frapsoft/openssl
-    command: req -nodes -x509 -newkey rsa:2048 -sha256 -keyout /data/privkey.pem -out /data/fullchain.pem -days 365 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=${DOMAIN}"
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    restart: on-failure
+    environment:
+      DOMAIN: '${DOMAIN}'
+      EMAIL: '${EMAIL}'
+    command: certonly --standalone --quiet -d ${DOMAIN} --agree-tos --email ${EMAIL}
+    ports:
+      - 443:443
+      - 80:80
     volumes:
-      - ./volume/certs/${DOMAIN}:/data/
+      - ./volume/certs/:/etc/letsencrypt/live/
+      - ./volume/letsencrypt/etc/:/etc/letsencrypt
+      - ./volume/letsencrypt/var/lib/:/var/lib/letsencrypt
+      - ./volume/letsencrypt/var/log/:/var/log/letsencrypt
 
   registry:
     container_name: registry
@@ -19,13 +29,15 @@ services:
     environment:
       REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
       REGISTRY_STORAGE_DELETE_ENABLED: 'false'
-      # REGISTRY_HTTP_TLS_CERTIFICATE: /certs/${DOMAIN}/fullchain.pem
-      # REGISTRY_HTTP_TLS_KEY: /certs/${DOMAIN}/privkey.pem
+      # REGISTRY_HTTP_TLS_CERTIFICATE: /certs/fullchain.pem
+      # REGISTRY_HTTP_TLS_KEY: /certs/privkey.pem
+    depends_on:
+      - certbot
     volumes:
       - ./volume/data:/data
-      - ./volume/certs:/certs
+      - /etc/letsencrypt/live/registry.keivanipchihagh.com/fullchain.pem:/certs/fullchain.pem/
+      - /etc/letsencrypt/live/registry.keivanipchihagh.com/privkey.pem/:/certs/privkey.pem
     networks:
-      - registry
       - nginx
 
   registry-ui:
@@ -36,19 +48,15 @@ services:
       - ${REGISTRY_UI_PORT}:80
     environment:
       REGISTRY_HOST: registry:5000
-      REGISTRY_DOMAIN: ${REGISTRY_DOMAIN}
+      REGISTRY_DOMAIN: ${DOMAIN}
       REGISTRY_STORAGE_DELETE_ENABLED: 1
-      # REGISTRY_SSL: 'true'
+      REGISTRY_SSL: 'false'
     depends_on:
       - registry
     networks:
       - nginx
-      - registry
 
 networks:
   nginx:
     name: nginx
     external: true
-  registry:
-    name: registry
-    internal: true

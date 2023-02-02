@@ -21,7 +21,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
     networks:
-      - services
+      - nginx
+      - private
 
 
   # Agent
@@ -45,10 +46,13 @@ services:
       - /var/lib/docker/volumes:/var/lib/docker/volumes
 
     networks:
-      - services
+      - private
 
 
 networks:
-  services:
-    name: services
-    external: true
+  nginx:
+    name: nginx
+    internal: true
+  private:
+    name: private
+    internal: true
