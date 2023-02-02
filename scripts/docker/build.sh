@@ -1,4 +1,3 @@
 #!/bin/bash
-curl https://get.docker.com/ --output install_docker.sh
-bash install_docker.sh
+curl https://get.docker.com/ --output install_docker.sh | bash
 apt install docker-compose
