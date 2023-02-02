@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+
+  # SSL Certificate
+  openssl:
+    container_name: openssl
+    image: frapsoft/openssl
+    restart: always
+    command: req -nodes -x509 -newkey rsa:2048 -sha256 -keyout /data/privkey.pem -out /data/fullchain.pem -days 365 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=${DOMAIN}"
+    volumes:
+      - ./volume/certs/${DOMAIN}:/data/
+
+  # Vault
+  vault:
+    image: vault:1.4.1
+    container_name: vault
+    restart: always
+    entrypoint: vault server -config /vault/config/config.hcl
+    ports:
+      - "8200:8200"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+    cap_add:
+      - IPC_LOCK
+    depends_on:
+      - openssl
+    volumes:
+      - ./volume/logs:/vault/logs
+      - ./volume/file:/vault/file
+      - ./volume/config:/vault/config
+      - ./volume/policies:/vault/policies
+      - ./volume/certs/${DOMAIN}:/certs
