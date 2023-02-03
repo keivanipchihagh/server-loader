@@ -1,9 +1,18 @@
 version: "3.7"
 
+x-common:
+  &common
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "100m"
+      max-file: "3"
+
 services:
 
   # Grafana
   grafana:
+    <<: *common
     image: grafana/grafana-enterprise:9.3.6
     container_name: grafana
     restart: always
@@ -27,6 +36,7 @@ services:
 
   # Prometheus
   prometheus:
+    <<: *common
     image: prom/prometheus:v2.42.0
     container_name: prometheus
     restart: always
@@ -36,6 +46,11 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--web.enable-lifecycle"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
     volumes:
       - ./prometheus/:/etc/prometheus/
       - ./volume/prometheus:/prometheus
@@ -45,6 +60,7 @@ services:
 
   # Node Exporter
   node-exporter:
+    <<: *common
     image: prom/node-exporter:v1.5.0
     container_name: node-exporter
     restart: always
@@ -54,6 +70,11 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
     command:
       - "--path.procfs=/host/proc"
       - "--path.rootfs=/rootfs"
@@ -64,12 +85,18 @@ services:
 
   # Cadvisor
   cadvisor:
+    <<: *common
     image: google/cadvisor:v0.33.0
     container_name: cadvisor
     privileged: true
     restart: always
     devices:
       - /dev/kmsg:/dev/kmsg
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -83,11 +110,17 @@ services:
 
   # AlertManager
   alertmanager:
+    <<: *common
     container_name: alertmanager
     image: prom/alertmanager:v0.25.0
     restart: unless-stopped
     ports:
       - ${ALERTMANAGER_PORT:-9093}:9093
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
     volumes:
       - ./alertmanager:/config
       - ./volume/alertmanager:/data

@@ -1,5 +1,13 @@
 version: '3.7'
 
+x-common:
+  &common
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "100m"
+      max-file: "3"
+
 services:
 
   # SSL Certificate
@@ -21,6 +29,7 @@ services:
       - ./volume/letsencrypt/var/log/:/var/log/letsencrypt
 
   registry:
+    <<: *common
     container_name: registry
     image: registry:2.7
     restart: always
@@ -41,6 +50,7 @@ services:
       - nginx
 
   registry-ui:
+    <<: *common
     container_name: registry-ui
     image: jc21/registry-ui:2.0.0
     restart: always
