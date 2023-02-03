@@ -3,7 +3,7 @@ version: "3.7"
 services:
   nginx-proxy-manager:
     container_name: nginx-proxy-manager
-    image: jc21/nginx-proxy-manager:github-pr-2250
+    image: jc21/nginx-proxy-manager:github-pr-2585
     restart: unless-stopped # Ensure proxy manager survives crashes
 
     ports:
