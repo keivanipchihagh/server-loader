@@ -4,7 +4,7 @@ services:
 
   # Grafana
   grafana:
-    image: grafana/grafana-enterprise:9.0.5
+    image: grafana/grafana-enterprise:9.3.6
     container_name: grafana
     restart: always
     user: "$UID:$GID"
@@ -16,18 +16,18 @@ services:
       GF_USERS_ALLOW_SIGN_UP: ${GF_USERS_ALLOW_SIGN_UP:-false}
       GF_AUTH_DISABLE_LOGIN_FORM: ${GF_AUTH_DISABLE_LOGIN_FORM:-false}
     volumes:
-      - ./grafana/grafana-data:/var/lib/grafana
+      - ./volume/grafana:/var/lib/grafana
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/config.ini:/etc/grafana/config.ini
-      # - ./grafana/dashboards:/var/lib/grafana/dashboards # default dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards # custom dashboards
     networks:
-      - services
-      - monitoring
+      - nginx
+      - private
 
   # Prometheus
   prometheus:
-    image: prom/prometheus:v2.30.3
+    image: prom/prometheus:v2.42.0
     container_name: prometheus
     restart: always
     user: "$UID:$GID"
@@ -38,14 +38,14 @@ services:
       - "--web.enable-lifecycle"
     volumes:
       - ./prometheus/:/etc/prometheus/
-      - ./prometheus/prometheus-data:/prometheus
+      - ./volume/prometheus:/prometheus
     networks:
-      - services
-      - monitoring
+      - nginx
+      - private
 
   # Node Exporter
   node-exporter:
-    image: prom/node-exporter:v1.3.1
+    image: prom/node-exporter:v1.5.0
     container_name: node-exporter
     restart: always
     ports:
@@ -60,12 +60,11 @@ services:
       - "--path.sysfs=/host/sys"
       - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
     networks:
-      - monitoring
-
+      - private
 
   # Cadvisor
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.44.0
+    image: google/cadvisor:v0.33.0
     container_name: cadvisor
     privileged: true
     restart: always
@@ -80,28 +79,28 @@ services:
     ports:
       - ${CADVISOR_PORT:-8080}:8080
     networks:
-      - monitoring
+      - private
 
   # AlertManager
   alertmanager:
     container_name: alertmanager
-    image: prom/alertmanager:v0.23.0
+    image: prom/alertmanager:v0.25.0
     restart: unless-stopped
     ports:
       - ${ALERTMANAGER_PORT:-9093}:9093
     volumes:
       - ./alertmanager:/config
-      - ./alertmanager/alertmanager-data:/data
+      - ./volume/alertmanager:/data
     command: --config.file=/config/alertmanager.yml --log.level=debug
     networks:
-      - monitoring
-      - services
+      - private
+      - nginx
 
 
 networks:
-  services:
-    name: services
+  nginx:
+    name: nginx
     external: true
-  monitoring:
-    name: monitoring
+  private:
+    name: private
     internal: true

@@ -26,36 +26,8 @@ scrape_configs:
   - job_name: 'exporter'
     static_configs:
       - targets:
-        - redis-exporter:9121       # Redis
+        # - redis-exporter:9121       # Redis
         - postgres-exporter:9187    # Postgres
-
-  # Redis targets
-  - job_name: 'redis'
-    file_sd_configs:
-      - files:
-        - targets/redis.json
-    metrics_path: /scrape
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: redis-exporter:9121
-
-  # # Postgres targets
-  # - job_name: 'postgres'
-  #   file_sd_configs:
-  #     - files:
-  #       - targets/postgres.json
-  #   metrics_path: /scrape
-  #   relabel_configs:
-  #     - source_labels: [__address__]
-  #       target_label: __param_target
-  #     - source_labels: [__param_target]
-  #       target_label: instance
-  #     - target_label: __address__
-  #       replacement: postgres-exporter:9187
   
   # Cadvisor targets
   - job_name: 'cadvisor'
