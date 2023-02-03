@@ -1,7 +1,6 @@
 global:
   # How frequently to scrape targets
   scrape_interval:     10s
-
   # How frequently to evaluate rules
   evaluation_interval: 10s  
 
@@ -14,21 +13,26 @@ rule_files:
 
 
 # Alerting specifies settings related to the Alertmanager
-# alerting:
-#   alertmanagers:
-#     - static_configs:
-#       - targets: ['alertmanager:9093']
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets: ['alertmanager:9093']
 
 
 scrape_configs:
 
-  # Exporters
-  - job_name: 'exporter'
-    static_configs:
-      - targets:
-        # - redis-exporter:9121       # Redis
-        - postgres-exporter:9187    # Postgres
-  
+  # Postgres targets
+  - job_name: 'postgres'
+    file_sd_configs:
+      - files:
+        - targets/postgres-exporter.json
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+
   # Cadvisor targets
   - job_name: 'cadvisor'
     file_sd_configs:
@@ -40,8 +44,6 @@ scrape_configs:
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
-      - target_label: __address__
-        replacement: cadvisor:8080
 
   # Node-Exporter targets
   - job_name: 'node-exporter'
@@ -54,5 +56,3 @@ scrape_configs:
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
-      - target_label: __address__
-        replacement: node-exporter:9100
