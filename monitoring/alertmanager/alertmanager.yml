@@ -1,4 +1,5 @@
 route:
+  receiver: 'webhook'
   # When a new group of alerts is created by an incoming alert, wait at
   # least 'group_wait' to send the initial notification.
   # This way ensures that you get multiple alerts for the same group that start
@@ -13,3 +14,9 @@ route:
   # If an alert has successfully been sent, wait 'repeat_interval' to
   # resend them.
   repeat_interval: 30m
+
+
+receivers:
+  - name: 'webhook'
+    webhook_configs:
+    - url: 'http://alertmanager:9093/api/v1/alerts'
