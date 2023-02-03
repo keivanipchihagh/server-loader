@@ -22,7 +22,7 @@ alerting:
 scrape_configs:
 
   # Postgres targets
-  - job_name: 'postgres'
+  - job_name: 'postgres-exporter'
     file_sd_configs:
       - files:
         - targets/postgres-exporter.json
@@ -50,6 +50,18 @@ scrape_configs:
     file_sd_configs:
       - files:
         - targets/node-exporter.json
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+
+  # Alertmanager targets
+  - job_name: 'alertmanager'
+    file_sd_configs:
+      - files:
+        - targets/alertmanager.json
     metrics_path: /metrics
     relabel_configs:
       - source_labels: [__address__]

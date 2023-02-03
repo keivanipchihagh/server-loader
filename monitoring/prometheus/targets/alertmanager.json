@@ -1,0 +1,9 @@
+[
+    {
+        "targets": [ "alertmanager:9093" ],
+        "labels": {
+            "env": "prod",
+            "job": "alertmanager"
+        }
+    }
+ ]

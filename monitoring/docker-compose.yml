@@ -29,7 +29,7 @@ services:
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/config.ini:/etc/grafana/config.ini
-      - ./grafana/dashboards:/var/lib/grafana/dashboards # custom dashboards
+      # - ./grafana/dashboards:/var/lib/grafana/dashboards # custom dashboards
     networks:
       - nginx
       - private
