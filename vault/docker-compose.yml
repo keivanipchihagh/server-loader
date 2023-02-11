@@ -1,54 +1,44 @@
 version: '3.7'
 
-services:
+x-common:
+  &common
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "100m"
+      max-file: "3"
 
-  # SSL Certificate
-  certbot:
-    container_name: certbot
-    image: certbot/certbot
-    restart: on-failure
-    environment:
-      DOMAIN: '${DOMAIN}'
-      EMAIL: '${EMAIL}'
-    command: certonly --standalone --quiet -d ${DOMAIN} --agree-tos --email ${EMAIL}
-    ports:
-      - 443:443
-      - 80:80
-    volumes:
-      - ./volume/certs/:/etc/letsencrypt/live/
-      - ./volume/letsencrypt/etc/:/etc/letsencrypt
-      - ./volume/letsencrypt/var/lib/:/var/lib/letsencrypt
-      - ./volume/letsencrypt/var/log/:/var/log/letsencrypt
+services:
 
   # Vault
   vault:
+    <<: *common
     image: vault:1.4.1
     container_name: vault
     restart: always
-    entrypoint: vault server -config /vault/config/config.hcl
+    entrypoint: vault server -config vault/config/config.hcl
     ports:
-      - "8200:8200"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-        max-file: "3"
+      - "${VAULT_PORT}:8200"
     cap_add:
       - IPC_LOCK
-    depends_on:
-      - certbot
     volumes:
       - ./volume/logs:/vault/logs
       - ./volume/file:/vault/file
       - ./volume/config:/vault/config
       - ./volume/policies:/vault/policies
-      - /etc/letsencrypt/live/${DOMAIN}/fullchain.pem/:/certs/fullchain.pem/
+      - ./vault-config.hcl:/vault/config/config.hcl
+      - /etc/letsencrypt/live/${DOMAIN}/fullchain.pem:/certs/fullchain.pem
       - /etc/letsencrypt/live/${DOMAIN}/privkey.pem:/certs/privkey.pem
     networks:
       - nginx
-
 
 networks:
   nginx:
     name: nginx
     internal: true
+  public:
+    name: public
+    external: true
+  private:
+    name: private
+    external: true
