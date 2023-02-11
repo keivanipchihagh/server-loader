@@ -2,31 +2,31 @@ version: '3.7'
 
 services:
 
+  # SSL Certificate
   certbot:
     container_name: certbot
     image: certbot/certbot
-    command: certonly --standalone --quiet -d ${CERTBOT_DOMAIN} --agree-tos --email ${CERTBOT_EMAIL}
+    command: certonly --standalone --quiet -d ${DOMAIN} --agree-tos --email ${EMAIL}
     ports:
       - 80:80
       - 443:443
     env_file:
       - .env
     volumes:
-      - ./certs/:/etc/letsencrypt/live/
-      - ./letsencrypt/etc/:/etc/letsencrypt
-      - ./letsencrypt/var/lib/:/var/lib/letsencrypt
-      - ./letsencrypt/var/log/:/var/log/letsencrypt
+      - ./volume/certs/:/etc/letsencrypt/live/
+      - ./volume/letsencrypt/etc/:/etc/letsencrypt
+      - ./volume/letsencrypt/var/lib/:/var/lib/letsencrypt
+      - ./volume/letsencrypt/var/log/:/var/log/letsencrypt
 
   # Management Panel
   xui:
     container_name: xui
     image: registry.keivanipchihagh.com/x-ui:beta
     restart: unless-stopped
-    depends_on:
-      - certbot
+    # depends_on:
+    #  - certbot
     volumes:
-        - ./db/:/etc/x-ui
-        - ./certs/:/root/certs
-        - ./letsencrypt/etc/:/root/
-        - /etc/letsencrypt/live/:/root/en-certs/
+        - ./volume/db/:/etc/x-ui
+        - /etc/letsencrypt/live/${DOMAIN}/fullchain.pem:/root/certs/${DOMAIN}/fullchain.pem
+        - /etc/letsencrypt/live/${DOMAIN}/privkey.pem:/root/certs/${DOMAIN}/privkey.pem
     network_mode: host
