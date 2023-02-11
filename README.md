@@ -1,4 +1,7 @@
 # server-loader
+pre-configured stacks and scripts to deploy my favorite production-ready services in a nutshell 🐳
+> **Note**
+> Use `.env.template` files as templates to create `.env` files that will be used in the stacks. All sensitive data have been emptied, so fill them yourself you must (:
 
 ## Stacks
 Stacks are used to deploy multiple containers that usually operate together and are dependent. Most of these stacks are pre-configured for painless deployment:
