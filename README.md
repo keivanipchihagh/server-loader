@@ -32,11 +32,11 @@ Stacks are used to deploy multiple containers that usually operate together and 
 ## Network Architecture
 To ensure flexibility and security for all services operating on the server, three Docker networks are defined:
 - **nginx**
-  - Type: `External`
-  - Info: Containers that must **only** be accessible from the reverse-proxy (unreachable by their IPs!) and are provided secure connection over TLS.
+  - Type: `Internal`
+  - Info: Containers that are **only** be accessible from the reverse-proxy (unreachable by their IP:PORT!) which are comminucated with over TLS.
 - **public**
   - Type: `External`
-  - Info: Containers that are publicly accessible by IPs over HTTP (unencrypted channel).
+  - Info: Containers that are publicly accessible by IP:PORT over HTTP (unencrypted channel).
 - **private**
   - Type: `Internal`
-  - Info: Containers that are not accessible from outside world. This network is **hidden** and used for internal traffic of sensitive services.
+  - Info: Containers that are not accessible from the outside world. This network is **hidden** and used for internal traffic of sensitive data.
