@@ -86,7 +86,7 @@ services:
   # Cadvisor
   cadvisor:
     <<: *common
-    image: google/cadvisor:v0.33.0
+    image: gcr.io/cadvisor/cadvisor
     container_name: cadvisor
     privileged: true
     restart: always
@@ -133,7 +133,7 @@ services:
 networks:
   nginx:
     name: nginx
-    external: true
+    internal: true
   private:
     name: private
     internal: true

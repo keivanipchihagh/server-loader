@@ -36,9 +36,3 @@ networks:
   nginx:
     name: nginx
     internal: true
-  public:
-    name: public
-    external: true
-  private:
-    name: private
-    external: true

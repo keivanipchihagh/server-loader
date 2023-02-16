@@ -69,4 +69,4 @@ services:
 networks:
   nginx:
     name: nginx
-    external: true
+    internal: true
