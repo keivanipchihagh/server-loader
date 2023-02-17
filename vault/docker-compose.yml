@@ -13,7 +13,7 @@ services:
   # Vault
   vault:
     <<: *common
-    image: vault:1.4.1
+    image: hashicorp/vault:1.13.0-rc1
     container_name: vault
     restart: always
     entrypoint: vault server -config vault/config/config.hcl
@@ -31,8 +31,12 @@ services:
       - /etc/letsencrypt/live/${DOMAIN}/privkey.pem:/certs/privkey.pem
     networks:
       - nginx
+      - private
 
 networks:
   nginx:
     name: nginx
+    internal: true
+  private:
+    name: private
     internal: true
