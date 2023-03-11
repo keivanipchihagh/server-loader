@@ -1,13 +1,8 @@
 #!/bin/bash
 
-if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
-  exit
-fi
-
-if [ -f .env ]; then
-  export $(echo $(cat .env | sed 's/#.*//g'| xargs) | envsubst)
-fi
+DOMAIN=example.com
+MANAGEMENT_PORT=62411
+API_PORT=62410
 
 sudo bash ../ufw/setup.sh
 sudo ufw allow $API_PORT/tcp
