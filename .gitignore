@@ -10,8 +10,6 @@ logs/
 
 # secrets and sensetive files
 .env
-*-secrets.*
-*-secret.*
 
 # volume dir
 volume/
