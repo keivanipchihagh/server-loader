@@ -9,4 +9,4 @@ kubectl apply -f namespace.yaml
 # Install Helm-charts
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
-helm install vault hashicorp/vault --namespace hashicorp --values values.yaml
+helm install vault hashicorp/vault --namespace hashicorp  --create-namespace --values values.yaml
