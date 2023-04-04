@@ -32,7 +32,7 @@ services:
     networks:
       - public
       - private
-
+  
   # pgadmin4
   pgadmin:
     <<: *common
