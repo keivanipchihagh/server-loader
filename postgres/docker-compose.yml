@@ -7,6 +7,8 @@ x-common:
     options:
       max-size: "100m"
       max-file: "3"
+  networks:
+    - private
 
 services:
 
@@ -29,8 +31,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./volume/postgres:/var/lib/postgresql/data
-    networks:
-      - private
   
   # pgadmin4
   pgadmin:
@@ -42,7 +42,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-      PGADMIN_CONFIG_SERVER_MODE: '${PGADMIN_CONFIG_SERVER_MODE:-False}'  # For servers-side deployment
+      PGADMIN_CONFIG_SERVER_MODE: '${PGADMIN_CONFIG_SERVER_MODE:-False}'  # Production Mode
     volumes:
        - ./volume/pgadmin:/var/lib/pgadmin
     ports:
@@ -61,8 +61,6 @@ services:
       - ${POSTGRES_EXPORTER_PORT:-9187}:9187
     environment:
       DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-postgres}?sslmode=${POSTGRES_SSL:-disable}"
-    networks:
-      - private
 
 
 networks:
