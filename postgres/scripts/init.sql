@@ -1,0 +1,2 @@
+-- Airflow
+CREATE DATABASE airflow;

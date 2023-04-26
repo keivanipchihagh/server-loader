@@ -31,6 +31,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./volume/postgres:/var/lib/postgresql/data
+      # Run SQL initiallization scripts (e.g. create database, create user, etc.) - NOTE: this will only run if the database is empty
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
   
   # pgadmin4
   pgadmin:
