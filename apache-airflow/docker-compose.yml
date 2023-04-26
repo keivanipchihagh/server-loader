@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.9'
 
 x-common:
   &common
@@ -6,23 +6,34 @@ x-common:
       context: .
       dockerfile: Dockerfile
   user: "${AIRFLOW_UID:-0}:0"
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "100m"
+      max-file: "3"
+  deploy:
+    resources:
+      limits:
+        cpus: '0.5'
+        memory: 1g
   environment:
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/airflow"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-airflow}"
     AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: "False"
     _AIRFLOW_DB_UPGRADE: "True"
     AIRFLOW__CORE__LOGGING_LEVEL: "INFO"
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
     AIRFLOW__CORE__LOAD_EXAMPLES: "False"
   env_file: 
-    - ../../.env
+    - .env
   volumes:
-    - ./airflow-data/dags:/opt/airflow/dags
-    - ./airflow-data/logs:/opt/airflow/logs
-    - ./airflow-data/plugins:/opt/airflow/plugins
+    - ./volume/airflow/dags:/opt/airflow/dags
+    - ./volume/airflow/logs:/opt/airflow/logs
+    - ./volume/airflow/plugins:/opt/airflow/plugins
     - /var/run/docker.sock:/var/run/docker.sock
   networks:
-    - airflow
-    - services
+    - private
+    - nginx
+    - public
 
 x-depends-on:
   &depends-on
@@ -44,7 +55,6 @@ services:
       retries: 5
     command: scheduler
     restart: on-failure
-
     ports:
       - "${AIRFLOW_SCHEDULER_PORT}:8793"
 
@@ -55,16 +65,14 @@ services:
     container_name: airflow-webserver
     restart: always
     command: webserver
-
     ports:
       - "${AIRFLOW_WEBSERVER_PORT:-8085}:8080"
-
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 10s
       timeout: 10s
       retries: 3
-  
+
   # Airflow Initializer
   airflow-init:
     <<: *common
@@ -78,9 +86,12 @@ services:
         exec /entrypoint airflow version
 
 networks:
-  services:
-    name: services
+  private:
+    name: private
     external: true
-  airflow:
-    name: airflow
+  nginx:
+    name: nginx
     internal: true
+  public:
+    name: public
+    external: true
