@@ -15,7 +15,7 @@ services:
       - '--maxmemory-policy allkeys-lru'
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
-      interval: 10s
+      interval: 30s
       timeout: 10s
       retries: 3
     ports:
@@ -24,24 +24,27 @@ services:
       - ./redis-data:/var/lib/redis # data persistence
       - ./redis.conf:/usr/local/etc/redis/redis.conf # data persistence
     networks:
-      - monitoring
+      - private
+      - public
 
 
   # Redis Exporter
   redis-exporter:
-    image: oliver006/redis_exporter:v1.43.0
+    image: oliver006/redis_exporter:v1.50.0
     container_name: redis-exporter
     restart: always
     ports:
     - ${REDIS_EXPORTER_PORT:-9121}:9121
     environment:
       REDIS_EXPORTER_INCL_SYSTEM_METRICS: "true"
-    command: --redis.password=${REDIS_PASSWORD}   # Global password for all redis instances for now; Use multiple ex>    networks:
+    command: --redis.password=${REDIS_PASSWORD}   # Global password for all redis instances
     networks:
-      - monitoring
-
+      - private
 
 networks:
-  monitoring:
-    name: monitoring
+  private:
+    name: private
     internal: true
+  public:
+    name: public
+    external: true
