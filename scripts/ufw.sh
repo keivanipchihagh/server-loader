@@ -9,11 +9,9 @@ sudo ufw default allow outgoing
 ufw allow ssh
 ufw allow http
 ufw allow https
+ufw allow ftp
 
-# K8s
+# Kubernetes
 sudo ufw allow 2379/tcp
 sudo ufw allow 6443/tcp
 sudo ufw allow 10250/tcp
-
-# nginx-proxy-manager UI
-# sudo ufw allow 81/tcp
