@@ -34,6 +34,7 @@ services:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql # SQL initiallization scripts
     networks:
       - nginx
+      - private
       - public
 
   # pgadmin4
