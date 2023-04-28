@@ -21,8 +21,8 @@ services:
     ports:
       - ${REDIS_PORT:-6379}:6379
     volumes:
-      - ./redis-data:/var/lib/redis # data persistence
-      - ./redis.conf:/usr/local/etc/redis/redis.conf # data persistence
+      - ./volume/redis/data:/var/lib/redis # data persistence
+      - ./volume/redis.conf:/usr/local/etc/redis/redis.conf # data persistence
     networks:
       - private
       - public
