@@ -68,3 +68,23 @@ scrape_configs:
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
+
+  # Redis targets
+  - job_name: 'redis'
+    file_sd_configs:
+      - files:
+        - targets/redis.json
+    metrics_path: /scrape
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: redis-exporter:9121
+
+  # Redis-exporter
+  - job_name: 'redis_exporter'
+    static_configs:
+      - targets:
+        - redis-exporter:9121

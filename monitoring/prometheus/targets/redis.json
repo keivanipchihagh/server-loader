@@ -1,9 +1,9 @@
 [
-        {
-                "targets": [ "redis:6379" ],
-                "labels": {
-                        "env": "prod",
-                        "job": "redis"
-                }
+    {
+        "targets": [ "redis://redis:6379" ],
+        "labels": {
+                "env": "prod",
+                "job": "redis"
         }
+    }
 ]

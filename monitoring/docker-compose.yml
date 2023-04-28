@@ -13,7 +13,7 @@ services:
   # Grafana
   grafana:
     <<: *common
-    image: grafana/grafana-enterprise:9.3.6
+    image: grafana/grafana-enterprise:9.5.1
     container_name: grafana
     restart: always
     user: "$UID:$GID"
@@ -29,7 +29,7 @@ services:
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/config.ini:/etc/grafana/config.ini
-      # - ./grafana/dashboards:/var/lib/grafana/dashboards # custom dashboards
+      # - ./grafana/dashboards:/var/lib/grafana/dashboards # default dashboards
     networks:
       - nginx
       - private
@@ -37,7 +37,7 @@ services:
   # Prometheus
   prometheus:
     <<: *common
-    image: prom/prometheus:v2.42.0
+    image: prom/prometheus:v2.43.0
     container_name: prometheus
     restart: always
     user: "$UID:$GID"
@@ -59,76 +59,75 @@ services:
       - private
 
   # Node Exporter
-  node-exporter:
-    <<: *common
-    image: prom/node-exporter:v1.5.0
-    container_name: node-exporter
-    restart: always
-    ports:
-      - ${NODE_PORT:-9100}:9100
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-        max-file: "3"
-    command:
-      - "--path.procfs=/host/proc"
-      - "--path.rootfs=/rootfs"
-      - "--path.sysfs=/host/sys"
-      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
-    networks:
-      - private
+  # node-exporter:
+  #   <<: *common
+  #   image: prom/node-exporter:v1.5.0
+  #   container_name: node-exporter
+  #   restart: always
+  #   ports:
+  #     - ${NODE_PORT:-9100}:9100
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "100m"
+  #       max-file: "3"
+  #   command:
+  #     - "--path.procfs=/host/proc"
+  #     - "--path.rootfs=/rootfs"
+  #     - "--path.sysfs=/host/sys"
+  #     - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+  #   networks:
+  #     - private
 
   # Cadvisor
-  cadvisor:
-    <<: *common
-    image: gcr.io/cadvisor/cadvisor
-    container_name: cadvisor
-    privileged: true
-    restart: always
-    devices:
-      - /dev/kmsg:/dev/kmsg
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-        max-file: "3"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      - /cgroup:/cgroup:ro  # Linux only
-    ports:
-      - ${CADVISOR_PORT:-8080}:8080
-    networks:
-      - private
+  # cadvisor:
+  #   <<: *common
+  #   image: gcr.io/cadvisor/cadvisor
+  #   container_name: cadvisor
+  #   privileged: true
+  #   restart: always
+  #   devices:
+  #     - /dev/kmsg:/dev/kmsg
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "100m"
+  #       max-file: "3"
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:ro
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker:/var/lib/docker:ro
+  #     - /cgroup:/cgroup:ro  # Linux only
+  #   ports:
+  #     - ${CADVISOR_PORT:-8080}:8080
+  #   networks:
+  #     - private
 
   # AlertManager
-  alertmanager:
-    <<: *common
-    container_name: alertmanager
-    image: prom/alertmanager:v0.25.0
-    restart: unless-stopped
-    ports:
-      - ${ALERTMANAGER_PORT:-9093}:9093
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-        max-file: "3"
-    volumes:
-      - ./alertmanager:/config
-      - ./volume/alertmanager:/data
-    command: --config.file=/config/alertmanager.yml --log.level=debug
-    networks:
-      - private
-      - nginx
-
+  # alertmanager:
+  #   <<: *common
+  #   container_name: alertmanager
+  #   image: prom/alertmanager:v0.25.0
+  #   restart: unless-stopped
+  #   ports:
+  #     - ${ALERTMANAGER_PORT:-9093}:9093
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "100m"
+  #       max-file: "3"
+  #   volumes:
+  #     - ./alertmanager:/config
+  #     - ./volume/alertmanager:/data
+  #   command: --config.file=/config/alertmanager.yml --log.level=debug
+  #   networks:
+  #     - private
+  #     - nginx
 
 networks:
   nginx:
