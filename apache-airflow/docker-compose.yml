@@ -11,18 +11,14 @@ x-common:
     options:
       max-size: "100m"
       max-file: "3"
-  deploy:
-    resources:
-      limits:
-        cpus: '0.5'
-        memory: 1g
+  # deploy:
+  #   resources:
+  #     limits:
+  #       cpus: '0.5'
+  #       memory: 1g
   environment:
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-airflow}"
-    AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: "False"
-    _AIRFLOW_DB_UPGRADE: "True"
-    AIRFLOW__CORE__LOGGING_LEVEL: "INFO"
-    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
-    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+
   env_file: 
     - .env
   volumes:
@@ -41,8 +37,8 @@ x-depends-on:
     airflow-init:
       condition: service_completed_successfully
 
-services:
 
+services:
   # Airflow Scheduler
   airflow-scheduler:
     <<: *common
@@ -66,7 +62,7 @@ services:
     restart: always
     command: webserver
     ports:
-      - "${AIRFLOW_WEBSERVER_PORT:-8085}:8080"
+      - "${AIRFLOW_WEBSERVER_PORT:-8080}:8080"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 10s
@@ -84,6 +80,7 @@ services:
         mkdir -p /sources/logs /sources/dags /sources/plugins
         chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
         exec /entrypoint airflow version
+
 
 networks:
   private:
