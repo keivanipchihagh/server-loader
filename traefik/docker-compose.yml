@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+
+  # Traefik
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    restart: always
+
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--experimental.hub=true"
+      - "--entrypoints.web.address=:${TRAEFIK_ENTRY_PORT}"
+      - "--metrics.prometheus.addrouterslabels=true"
+
+    ports:
+      - ${TRAEFIK_ENTRY_PORT}:80
+      - ${TRAEFIK_PORT}:8080
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+    networks:
+      - epd
+
+
+networks:
+  epd:
+    external: true
